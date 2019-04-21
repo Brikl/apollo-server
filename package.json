@@ -1,8 +1,11 @@
 {
-  "name": "apollo-server-monorepo",
-  "private": true,
+  "name": "@brikl/apollo-server-monorepo",
+  "private": false,
   "license": "MIT",
-  "repository": "github:apollographql/apollo-server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brikl/apollo-server.git"
+  },
   "scripts": {
     "clean": "git clean -dfqX -- ./node_modules **/{dist,node_modules}/ ./packages/*/tsconfig*tsbuildinfo",
     "compile": "tsc --build tsconfig.build.json",
@@ -138,5 +141,16 @@
     "projects": [
       "<rootDir>/packages/*"
     ]
-  }
+  },
+  "description": "[![npm version](https://badge.fury.io/js/apollo-server-core.svg)](https://badge.fury.io/js/apollo-server-core) [![Build Status](https://circleci.com/gh/apollographql/apollo-server.svg?style=svg)](https://circleci.com/gh/apollographql/apollo-server) [![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/apollo)",
+  "bugs": {
+    "url": "https://github.com/Brikl/apollo-server/issues"
+  },
+  "homepage": "https://github.com/Brikl/apollo-server#readme",
+  "version": "1.0.0",
+  "main": ".prettierrc.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "author": ""
 }
