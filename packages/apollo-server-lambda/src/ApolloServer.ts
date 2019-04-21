@@ -48,6 +48,12 @@ export class ApolloServer extends ApolloServerBase {
     return super.graphQLServerOptions({ event, context });
   }
 
+  // With the release of API Gateway Management v2 we can now support websockets
+  // in Lambda environments
+  protected supportsSubscriptions(): boolean {
+    return true;
+  }
+
   public createHandler({ cors }: CreateHandlerOptions = { cors: undefined }) {
     // We will kick off the `willStart` event once for the server, and then
     // await it before processing any requests by incorporating its `await` into
