@@ -1,12 +1,9 @@
 {
   "name": "apollo-server-micro",
-  "version": "1.3.6",
+  "version": "2.4.8",
   "description": "Production-ready Node.js GraphQL server for Micro",
   "main": "dist/index.js",
-  "scripts": {
-    "compile": "tsc",
-    "prepublish": "npm run compile"
-  },
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-micro"
@@ -16,30 +13,22 @@
     "Apollo",
     "Micro",
     "Server",
-    "Javascript"
+    "Javascript",
+    "ZEIT"
   ],
-  "author": "Nick Nance <nance.nick@gmail.email>",
+  "author": "opensource@apollographql.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/apollographql/apollo-server/issues"
   },
   "homepage": "https://github.com/apollographql/apollo-server#readme",
   "dependencies": {
-    "apollo-server-core": "^1.3.6",
-    "apollo-server-module-graphiql": "^1.3.4"
+    "@apollographql/graphql-playground-html": "^1.6.6",
+    "accept": "^3.0.2",
+    "apollo-server-core": "file:../apollo-server-core",
+    "micro": "^9.3.2"
   },
   "devDependencies": {
-    "@types/graphql": "0.12.7",
-    "@types/micro": "7.3.1",
-    "apollo-server-integration-testsuite": "^1.3.6",
-    "micro": "8.0.4",
-    "microrouter": "2.2.3"
-  },
-  "peerDependencies": {
-    "micro": "^8.0.1 || ^9.0.1"
-  },
-  "typings": "dist/index.d.ts",
-  "typescript": {
-    "definition": "dist/index.d.ts"
+    "apollo-server-integration-testsuite": "file:../apollo-server-integration-testsuite"
   }
 }

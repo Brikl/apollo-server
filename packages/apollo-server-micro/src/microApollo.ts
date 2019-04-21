@@ -1,18 +1,31 @@
 import {
   GraphQLOptions,
-  HttpQueryError,
   runHttpQuery,
+  convertNodeHttpToRequest,
 } from 'apollo-server-core';
-import * as GraphiQL from 'apollo-server-module-graphiql';
-import { createError, json, RequestHandler } from 'micro';
-import * as url from 'url';
+import { send, json, RequestHandler } from 'micro';
+import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 
+import { MicroRequest } from './types';
+import { ValueOrPromise } from 'apollo-server-env';
+
+// Allowed Micro Apollo Server options.
 export interface MicroGraphQLOptionsFunction {
-  (req?: IncomingMessage): GraphQLOptions | Promise<GraphQLOptions>;
+  (req?: IncomingMessage): ValueOrPromise<GraphQLOptions>;
 }
 
-export function microGraphql(
+// Utility function used to set multiple headers on a response object.
+function setHeaders(res: ServerResponse, headers: Object): void {
+  Object.keys(headers).forEach((header: string) => {
+    res.setHeader(header, headers[header]);
+  });
+}
+
+// Build and return an async function that passes incoming GraphQL requests
+// over to Apollo Server for processing, then fires the results/response back
+// using Micro's `send` functionality.
+export function graphqlMicro(
   options: GraphQLOptions | MicroGraphQLOptionsFunction,
 ): RequestHandler {
   if (!options) {
@@ -25,71 +38,39 @@ export function microGraphql(
     );
   }
 
-  const graphqlHandler = async (req: IncomingMessage, res: ServerResponse) => {
+  const graphqlHandler = async (req: MicroRequest, res: ServerResponse) => {
     let query;
-    if (req.method === 'POST') {
-      try {
-        query = await json(req);
-      } catch (err) {
-        query = undefined;
-      }
-    } else {
-      query = url.parse(req.url, true).query;
+    try {
+      query =
+        req.method === 'POST'
+          ? req.filePayload || (await json(req))
+          : url.parse(req.url, true).query;
+    } catch (error) {
+      // Do nothing; `query` stays `undefined`
     }
 
     try {
-      const gqlResponse = await runHttpQuery([req, res], {
+      const { graphqlResponse, responseInit } = await runHttpQuery([req, res], {
         method: req.method,
-        options: options,
-        query: query,
+        options,
+        query,
+        request: convertNodeHttpToRequest(req),
       });
-
-      res.setHeader('Content-Type', 'application/json');
-      return gqlResponse;
+      setHeaders(res, responseInit.headers);
+      return graphqlResponse;
     } catch (error) {
-      if ('HttpQueryError' === error.name) {
-        if (error.headers) {
-          Object.keys(error.headers).forEach(header => {
-            res.setHeader(header, error.headers[header]);
-          });
-        }
+      if ('HttpQueryError' === error.name && error.headers) {
+        setHeaders(res, error.headers);
       }
 
       if (!error.statusCode) {
         error.statusCode = 500;
       }
 
-      throw error;
+      send(res, error.statusCode, error.message);
+      return undefined;
     }
   };
 
   return graphqlHandler;
-}
-
-export interface MicroGraphiQLOptionsFunction {
-  (req?: IncomingMessage):
-    | GraphiQL.GraphiQLData
-    | Promise<GraphiQL.GraphiQLData>;
-}
-
-export function microGraphiql(
-  options: GraphiQL.GraphiQLData | MicroGraphiQLOptionsFunction,
-): RequestHandler {
-  const graphiqlHandler = (req: IncomingMessage, res: ServerResponse) => {
-    const query = (req.url && url.parse(req.url, true).query) || {};
-    return GraphiQL.resolveGraphiQLString(query, options, req).then(
-      graphiqlString => {
-        res.setHeader('Content-Type', 'text/html');
-        res.write(graphiqlString);
-        res.end();
-      },
-      error => {
-        res.statusCode = 500;
-        res.write(error.message);
-        res.end();
-      },
-    );
-  };
-
-  return graphiqlHandler;
 }

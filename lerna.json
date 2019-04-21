@@ -1,18 +1,4 @@
 {
-  "lerna": "2.0.0",
-  "version": "1.3.6",
-  "changelog": {
-    "repo": "apollographql/apollo-server",
-    "labels": {
-      "tag: breaking change": ":boom: Breaking Change",
-      "tag: new feature": ":rocket: New Feature",
-      "tag: bug fix": ":bug: Bug Fix",
-      "tag: polish": ":nail_care: Polish",
-      "tag: documentation": "Documentation",
-      "tag: internal": ":house: Internal"
-    }
-  },
-  "packages": [
-    "packages/*"
-  ]
+  "packages": ["packages/*"],
+  "version": "independent"
 }

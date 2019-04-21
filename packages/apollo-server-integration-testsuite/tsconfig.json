@@ -1,9 +1,15 @@
 {
-  "extends": "../../tsconfig",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "typeRoots": ["node_modules/@types"]
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "types": ["node", "jest", "apollo-server-env/dist/global"]
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["**/__tests__", "**/__mocks__"],
+  "references": [
+    { "path": "../apollo-server-core" }
+  ]
 }
